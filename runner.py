@@ -125,6 +125,46 @@ def show_transactions(customer: Customer) -> None:
         )
 
 
+# ── Create Account ────────────────────────────────────────────────────────────
+
+def create_account(bank: Bank) -> None:
+    print("\n  -- Create Account --")
+    name = input("  Full name: ").strip()
+    if not name:
+        print("  Name cannot be empty.")
+        return
+
+    if bank.find_customer(name):
+        print("  An account with that name already exists.")
+        return
+
+    pin = input("  Create a PIN: ").strip()
+    if not pin:
+        print("  PIN cannot be empty.")
+        return
+
+    print()
+    print("  Account types:")
+    print("  1. Checking")
+    print("  2. Savings")
+    print()
+    choice = input("  Select account type: ").strip()
+
+    if choice == "1":
+        account = CheckingAccount(name)
+    elif choice == "2":
+        account = SavingsAccount(name)
+    else:
+        print("  Invalid account type.")
+        return
+
+    customer = Customer(name, pin)
+    customer.add_account(account)
+    bank.add_customer(customer)
+    print(f"\n  Account created! Welcome, {name}.")
+    print(f"  Your account ID is: {account.get_account_id()}")
+
+
 # ── Login ─────────────────────────────────────────────────────────────────────
 
 def login(bank: Bank) -> Customer | None:
@@ -214,18 +254,21 @@ def main() -> None:
 
     while True:
         print()
-        print("  1. Log in")
-        print("  2. Exit")
+        print("  1. Create Account")
+        print("  2. Log in")
+        print("  3. Exit")
         print()
 
         choice = input("  Choose an option: ").strip()
 
         match choice:
             case "1":
+                create_account(bank)
+            case "2":
                 customer = login(bank)
                 if customer:
                     session(customer)
-            case "2":
+            case "3":
                 print("\n  Thank you for banking with Citi. Goodbye!\n")
                 break
             case _:
